@@ -16,5 +16,5 @@ export fn exit_hellokernel() callconv(.C) void {
 }
 
 test "test1" {
-    print("{s}\n", .{"Hello stdout \"kernel\"!"});
+    print("\n{s}\n", .{"Hello stdout \"kernel\"!"});
 }

@@ -11,7 +11,7 @@
 #include <mymodule.h>
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Reki");
+MODULE_AUTHOR("Kassane");
 MODULE_DESCRIPTION("Zig");
 
 static int __init _init_hellokernel(void) {
