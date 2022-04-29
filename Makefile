@@ -2,7 +2,7 @@ KERNELDIR ?= /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
 SOURCE := src
 # The zig main file name
-ZIGMODULE := mymodule
+ZIGMODULE := zigmodule
 MODULENAME := $(ZIGMODULE)
 
 obj-m := $(MODULENAME).o

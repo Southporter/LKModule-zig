@@ -2,7 +2,7 @@ const std = @import("std");
 const fmt = std.fmt;
 
 pub fn build(b: *std.build.Builder) void {
-    const mainFileName = "mymodule";
+    const mainFileName = "zigmodule";
     const src_dir = "src";
     const mainFilePath = fmt.comptimePrint("{s}/{s}.zig", .{ src_dir, mainFileName });
     const kernelFilePath = fmt.comptimePrint("{s}/{s}.zig", .{ src_dir, "kernel" });

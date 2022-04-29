@@ -5,7 +5,8 @@ const KError = error{
     C,
 };
 
-extern fn printk(fmt: [*:0]const u8) void;
+extern fn _printk(fmt: [*:0]const u8, ...) void;
+const printk = _printk;
 
 fn writeFn(context: void, bytes: []const u8) KError!usize {
     printk(@ptrCast([*c]const u8, bytes));

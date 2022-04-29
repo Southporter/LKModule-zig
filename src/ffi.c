@@ -8,7 +8,7 @@
 #include <linux/kernel.h>
 #include <linux/init.h>
 
-#include <mymodule.h>
+#include <zigmodule.h>
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Kassane");
