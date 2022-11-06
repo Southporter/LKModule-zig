@@ -17,6 +17,7 @@ pub fn build(b: *std.build.Builder) void {
     const obj = b.addObject(mainFileName, mainFilePath);
     obj.output_dir = src_dir;
     obj.setTarget(.{ .os_tag = .freestanding });
+    obj.setBuildMode(.ReleaseSmall);
 
     const obj_step = b.step("obj", "Make debug object file");
     obj_step.dependOn(&obj.step);

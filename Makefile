@@ -1,4 +1,5 @@
-KERNELDIR ?= /lib/modules/$(shell uname -r)/build
+KERNELRELEASE=$(uname -r)
+KERNELDIR ?= /lib/modules/$(KERNELRELEASE)/build
 PWD := $(shell pwd)
 SOURCE := src
 # The zig main file name
