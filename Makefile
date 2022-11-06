@@ -1,4 +1,4 @@
-KERNELRELEASE=$(uname -r)
+KERNELRELEASE=$(shell uname -r)
 KERNELDIR ?= /lib/modules/$(KERNELRELEASE)/build
 PWD := $(shell pwd)
 SOURCE := src
