@@ -6,12 +6,12 @@ const builtin = @import("builtin");
 const print = (if (builtin.os.tag == .freestanding) @import("kernel.zig") else @import("debug.zig"))
     .print;
 
-export fn init_hellokernel() callconv(.C) c_int {
+export fn init_hellokernel() c_int {
     print("{s}\n", .{"Hello kernel!"});
     return 0;
 }
 
-export fn exit_hellokernel() callconv(.C) void {
+export fn exit_hellokernel() void {
     print("{s}\n", .{"Goodbye kernel!"});
 }
 
