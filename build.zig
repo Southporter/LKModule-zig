@@ -2,25 +2,11 @@ const std = @import("std");
 const fmt = std.fmt;
 
 pub fn build(b: *std.Build) void {
-    const mainFileName = "zigmodule";
-    const src_dir = "src";
-    const mainFilePath = fmt.comptimePrint("{s}/{s}.zig", .{
-        src_dir,
-        mainFileName,
-    });
-    const kernelFilePath = fmt.comptimePrint("{s}/{s}.zig", .{
-        src_dir,
-        "kernel",
-    });
     const main_tests = b.addTest(.{
-        .root_source_file = .{
-            .path = mainFilePath,
-        },
+        .root_source_file = b.path("src/zigmodule.zig"),
     });
     const kernel_tests = b.addTest(.{
-        .root_source_file = .{
-            .path = kernelFilePath,
-        },
+        .root_source_file = b.path("src/kernel.zig"),
     });
     kernel_tests.linkLibC();
 
@@ -29,20 +15,28 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&kernel_tests.step);
 
     const obj = b.addObject(.{
-        .name = mainFileName,
-        .target = .{ .os_tag = .freestanding },
+        .name = "zigmodule",
+        .target = b.resolveTargetQuery(.{
+            .os_tag = .freestanding,
+        }),
+        // .target = .{ .os_tag = .freestanding },
         .optimize = .ReleaseSmall,
-        .root_source_file = .{
-            .path = mainFilePath,
+        .root_source_file = b.path("src/zigmodule.zig"),
+        .code_model = .kernel,
+        .strip = true,
+    });
+    obj.addSystemIncludePath(b.path("include"));
+    obj.bundle_compiler_rt = false;
+    obj.export_table = false;
+    // obj.disable_stack_probing = false;
+    // obj.disable_sanitize_c = false;
+    // obj.override_dest_dir = .{ .custom = "obj" };
+    const artifact = b.addInstallArtifact(obj, .{
+        .dest_dir = .{
+            .override = .{
+                .custom = "obj",
+            },
         },
     });
-    obj.addSystemIncludePath("include");
-    obj.bundle_compiler_rt = false;
-    obj.code_model = .kernel;
-    obj.export_table = false;
-    obj.disable_stack_probing = false;
-    obj.disable_sanitize_c = false;
-    obj.strip = true;
-    obj.override_dest_dir = .{ .custom = "obj" };
-    b.installArtifact(obj);
+    b.getInstallStep().dependOn(&artifact.step);
 }

@@ -29,7 +29,7 @@ fn testPrint(v: void, str: []const u8) KError!usize {
     const cstr = try addNullByte(allocator, str);
     allocator.free(cstr);
     const len_or_err = printf("%*", &cstr);
-    return if (len_or_err < 0) error.C else @intCast(usize, len_or_err);
+    return if (len_or_err < 0) error.C else @intCast(len_or_err);
 }
 
 test "writeFn" {
