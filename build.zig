@@ -25,7 +25,7 @@ pub fn build(b: *std.Build) void {
         .code_model = .kernel,
         .strip = true,
     });
-    obj.addSystemIncludePath(b.path("include"));
+    obj.addIncludePath(b.path("include"));
     obj.addSystemIncludePath(.{ .cwd_relative = "/usr/include" });
     obj.bundle_compiler_rt = false;
     obj.export_table = false;
@@ -41,24 +41,41 @@ pub fn build(b: *std.Build) void {
     });
     b.getInstallStep().dependOn(&artifact.step);
 
-    const obj_c = b.addObject(.{
-        .name = "zig_c_module",
+    const kernel_src = b.addTranslateC(.{
+        .root_source_file = b.path("src/headers.h"),
         .target = b.resolveTargetQuery(.{
             .os_tag = .freestanding,
         }),
-        // .target = .{ .os_tag = .freestanding },
         .optimize = .ReleaseSmall,
+        .link_libc = true,
+    });
+
+    // Change these paths to match your kernel source tree
+    kernel_src.addSystemIncludePath(.{ .cwd_relative = "/usr/src/kernels/6.15.9-201.fc42.x86_64/include" });
+    kernel_src.addSystemIncludePath(.{ .cwd_relative = "/usr/src/kernels/6.15.9-201.fc42.x86_64/arch/x86/include" });
+    kernel_src.addSystemIncludePath(.{ .cwd_relative = "/usr/src/kernels/6.15.9-201.fc42.x86_64/arch/x86/include/uapi" });
+    kernel_src.addSystemIncludePath(.{ .cwd_relative = "/usr/src/kernels/6.15.9-201.fc42.x86_64/arch/x86/include/generated" });
+    kernel_src.addSystemIncludePath(.{ .cwd_relative = "/usr/src/kernels/6.15.9-201.fc42.x86_64/arch/x86/include/generated/uapi" });
+    kernel_src.addSystemIncludePath(.{ .cwd_relative = "/usr/src/kernels/6.15.9-201.fc42.x86_64/include/uapi" });
+
+    const kernel_mod = kernel_src.createModule();
+
+    const c_mod = b.createModule(.{
         .root_source_file = b.path("src/zigmodule_with_c.zig"),
+        .target = b.resolveTargetQuery(.{
+            .os_tag = .freestanding,
+        }),
+        .optimize = .ReleaseSmall,
         .code_model = .kernel,
+    });
+    c_mod.addImport("kernel", kernel_mod);
+
+    const obj_c = b.addObject(.{
+        .name = "zig_c_module",
+        .code_model = .kernel,
+        .root_module = c_mod,
         .strip = true,
     });
-    obj_c.linkLibC();
-    obj_c.addSystemIncludePath(.{ .cwd_relative = "/usr/src/kernels/6.15.9-201.fc42.x86_64/include" });
-    obj_c.addSystemIncludePath(.{ .cwd_relative = "/usr/src/kernels/6.15.9-201.fc42.x86_64/arch/x86/include" });
-    obj_c.addSystemIncludePath(.{ .cwd_relative = "/usr/src/kernels/6.15.9-201.fc42.x86_64/arch/x86/include/uapi" });
-    obj_c.addSystemIncludePath(.{ .cwd_relative = "/usr/src/kernels/6.15.9-201.fc42.x86_64/arch/x86/include/generated" });
-    obj_c.addSystemIncludePath(.{ .cwd_relative = "/usr/src/kernels/6.15.9-201.fc42.x86_64/arch/x86/include/generated/uapi" });
-    obj_c.addSystemIncludePath(.{ .cwd_relative = "/usr/src/kernels/6.15.9-201.fc42.x86_64/include/uapi" });
     obj_c.bundle_compiler_rt = false;
     obj_c.export_table = false;
 
